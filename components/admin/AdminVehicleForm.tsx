@@ -57,7 +57,7 @@ export function AdminVehicleForm({ vehicle }: { vehicle?: Vehicle }) {
     }
 
     const { register, handleSubmit, formState: { errors } } = useForm<FormData>({
-        resolver: zodResolver(formSchema),
+        resolver: zodResolver(formSchema) as any,
         defaultValues: defaultValues as any
     })
 
