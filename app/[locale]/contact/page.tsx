@@ -7,7 +7,10 @@ import { Input } from "@/components/ui/input"
 import { Card } from "@/components/ui/card"
 import { MessageCircle, Phone } from "lucide-react"
 import { useState, useTransition } from "react"
+import { useTranslations } from "next-intl"
+
 export default function ContactPage() {
+    const t = useTranslations('Contact')
     const [isPending, startTransition] = useTransition()
     const [status, setStatus] = useState<{ type: 'success' | 'error', message: string } | null>(null)
 
@@ -29,13 +32,13 @@ export default function ContactPage() {
                 const data = await response.json()
 
                 if (data.success) {
-                    setStatus({ type: 'success', message: "Message sent successfully!" })
+                    setStatus({ type: 'success', message: t('success') })
                     form.reset()
                 } else {
-                    setStatus({ type: 'error', message: "Failed to send message. Please try again." })
+                    setStatus({ type: 'error', message: t('error') })
                 }
             } catch (error) {
-                setStatus({ type: 'error', message: "An error occurred. Please try again." })
+                setStatus({ type: 'error', message: t('error') })
             }
         })
     }
@@ -44,7 +47,7 @@ export default function ContactPage() {
         <main className="min-h-screen flex flex-col">
             <Navbar />
             <div className="flex-1 container mx-auto px-4 py-12">
-                <h1 className="font-serif text-4xl text-center mb-12">Contact Us</h1>
+                <h1 className="font-serif text-4xl text-center mb-12">{t('title')}</h1>
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 max-w-5xl mx-auto">
                     <div className="space-y-8">
@@ -63,7 +66,7 @@ export default function ContactPage() {
 
                         <div className="grid grid-cols-2 gap-6">
                             <div className="space-y-2">
-                                <h3 className="font-bold">Showroom</h3>
+                                <h3 className="font-bold">{t('showroom')}</h3>
                                 <p className="text-muted-foreground text-sm">
                                     Kupferstraße 24<br />
                                     33378 Rheda-Wiedenbrück<br />
@@ -71,7 +74,7 @@ export default function ContactPage() {
                                 </p>
                             </div>
                             <div className="space-y-2">
-                                <h3 className="font-bold">Contact</h3>
+                                <h3 className="font-bold">{t('contact_info')}</h3>
                                 <p className="text-muted-foreground text-sm">
                                     +34 685 81 81 68<br />
                                     concierge@aureamotors.com
@@ -79,7 +82,7 @@ export default function ContactPage() {
                                 <Button className="w-full sm:w-auto mt-2 bg-[#25D366] hover:bg-[#128C7E] text-white border-none" asChild>
                                     <a href="https://wa.me/+34685818168" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2">
                                         <MessageCircle className="w-4 h-4" />
-                                        Chat via WhatsApp
+                                        {t('chat_whatsapp')}
                                     </a>
                                 </Button>
                             </div>
@@ -87,7 +90,7 @@ export default function ContactPage() {
                     </div>
 
                     <Card className="p-8">
-                        <h2 className="font-serif text-2xl mb-6">Send an Inquiry</h2>
+                        <h2 className="font-serif text-2xl mb-6">{t('form_title')}</h2>
 
                         {status && (
                             <div className={`p-4 mb-6 text-sm rounded ${status.type === 'success' ? 'bg-green-500/10 text-green-500' : 'bg-destructive/10 text-destructive'}`}>
@@ -98,29 +101,29 @@ export default function ContactPage() {
                         <form id="contact-form" onSubmit={onSubmit} className="space-y-4">
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="space-y-2">
-                                    <label className="text-sm font-medium">First Name</label>
+                                    <label className="text-sm font-medium">{t('first_name')}</label>
                                     <Input name="first_name" placeholder="John" required />
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-sm font-medium">Last Name</label>
+                                    <label className="text-sm font-medium">{t('last_name')}</label>
                                     <Input name="last_name" placeholder="Doe" required />
                                 </div>
                             </div>
                             <div className="space-y-2">
-                                <label className="text-sm font-medium">Email</label>
+                                <label className="text-sm font-medium">{t('email')}</label>
                                 <Input name="email" type="email" placeholder="john@example.com" required />
                             </div>
                             <div className="space-y-2">
-                                <label className="text-sm font-medium">Message</label>
+                                <label className="text-sm font-medium">{t('message')}</label>
                                 <textarea
                                     name="message"
                                     required
                                     className="flex min-h-[120px] w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                                    placeholder="I am interested in..."
+                                    placeholder={t('message_placeholder')}
                                 />
                             </div>
                             <Button type="submit" size="lg" className="w-full" disabled={isPending}>
-                                {isPending ? "Sending..." : "Send Message"}
+                                {isPending ? t('sending') : t('submit')}
                             </Button>
                         </form>
                     </Card>

@@ -35,6 +35,8 @@ import { saveLocalFile, deleteLocalFile } from "@/lib/storage"
 
 // --- Vehicle Actions ---
 
+import { generateVehicleTranslations } from "@/lib/translation"
+
 const vehicleSchema = z.object({
     brand: z.string().min(1),
     model: z.string().min(1),
@@ -79,6 +81,12 @@ export async function createVehicle(prevState: any, formData: FormData) {
         return { error: "Validation failed", issues: result.error.flatten() }
     }
 
+    // Generate Translations
+    let translations = {}
+    if (result.data.description) {
+        translations = await generateVehicleTranslations(result.data.description)
+    }
+
     // Handle Image Uploads
     const imageFiles = formData.getAll("image_files") as File[]
     const imageUrls: string[] = []
@@ -103,6 +111,7 @@ export async function createVehicle(prevState: any, formData: FormData) {
         .from("vehicles")
         .insert({
             ...result.data,
+            translations, // Add translations to insert
             images: imageUrls
         })
 
@@ -139,6 +148,13 @@ export async function updateVehicle(id: string, prevState: any, formData: FormDa
 
     if (!result.success) {
         return { error: "Validation failed" }
+    }
+
+    // Generate Translations (always regenerate on update for now to ensure sync)
+    // Could optimize to check if description changed.
+    let translations = {}
+    if (result.data.description) {
+        translations = await generateVehicleTranslations(result.data.description)
     }
 
     // --- Image Logic ---
@@ -185,6 +201,7 @@ export async function updateVehicle(id: string, prevState: any, formData: FormDa
         .from("vehicles")
         .update({
             ...result.data,
+            translations, // Update translations
             images: finalImages
         })
         .eq("id", id)

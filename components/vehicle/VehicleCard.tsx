@@ -1,6 +1,6 @@
 "use client"
 
-import Link from "next/link"
+import { Link } from "@/i18n/routing"
 import Image from "next/image"
 import { motion } from "framer-motion"
 import { Fuel, Gauge, Calendar, ArrowUpRight } from "lucide-react"
@@ -9,8 +9,11 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { formatCurrency, formatNumber } from "@/lib/utils"
 import type { Vehicle } from "@/types"
+import { useTranslations } from "next-intl"
 
 export function VehicleCard({ vehicle }: { vehicle: Vehicle }) {
+    const t = useTranslations('VehicleCard');
+
     return (
         <Link href={`/vehicle/${vehicle.id}`} className="group block h-full">
             <Card className="h-full overflow-hidden border-border/50 bg-card/50 transition-all duration-500 hover:border-primary/50 hover:shadow-[0_0_30px_-10px_rgba(212,175,55,0.15)]">
@@ -25,7 +28,7 @@ export function VehicleCard({ vehicle }: { vehicle: Vehicle }) {
                         />
                     ) : (
                         <div className="flex h-full items-center justify-center bg-muted text-muted-foreground">
-                            No Image
+                            {t('no_image')}
                         </div>
                     )}
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
@@ -36,7 +39,7 @@ export function VehicleCard({ vehicle }: { vehicle: Vehicle }) {
                     </div>
                     {vehicle.featured && (
                         <Badge variant="luxury" className="absolute left-4 top-4 backdrop-blur-md">
-                            Featured
+                            {t('featured')}
                         </Badge>
                     )}
                 </div>

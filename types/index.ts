@@ -11,6 +11,7 @@ export type Vehicle = {
     color: string
     power_hp: number | null
     description: string | null
+    translations: Record<string, any> | null // JSONB in DB
     featured: boolean
     images: string[]
     created_at: string

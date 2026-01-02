@@ -1,22 +1,23 @@
 "use client"
 
 import * as React from "react"
-import Link from "next/link"
-import { usePathname } from "next/navigation"
+import { Link } from "@/i18n/routing"
+import { usePathname } from "@/i18n/routing"
 import { motion } from "framer-motion"
 import { cn } from "@/lib/utils"
-// import { Button } from "@/components/ui/button" // Uncomment if needed
-
-const NAV_ITEMS = [
-    { label: "Collection", href: "/inventory" },
-    { label: "Services", href: "/#services" },
-    { label: "Contact", href: "/contact" },
-]
+import { LanguageSwitcher } from "@/components/LanguageSwitcher"
+import { useTranslations } from "next-intl"
 
 export function Navbar() {
+    const t = useTranslations('Navbar');
     const pathname = usePathname()
-    const [isOpen, setIsOpen] = React.useState(false) // Added isOpen state
-    const isScrolled = false // Could implement scroll hook if needed
+    const [isOpen, setIsOpen] = React.useState(false)
+
+    const NAV_ITEMS = [
+        { label: t('collection'), href: "/inventory" },
+        { label: t('services'), href: "/#services" },
+        { label: t('contact'), href: "/contact" },
+    ]
 
     return (
         <header className="sticky top-0 z-50 w-full border-b border-white/5 bg-background/80 backdrop-blur-md supports-[backdrop-filter]:bg-background/60">
@@ -39,9 +40,13 @@ export function Navbar() {
                             {item.label}
                         </Link>
                     ))}
+                    <div className="ml-4">
+                        <LanguageSwitcher />
+                    </div>
                 </nav>
-                {/* Mobile Menu Placeholder - could add proper mobile menu later */}
-                <div className="md:hidden">
+                {/* Mobile Menu Placeholder */}
+                <div className="md:hidden flex items-center gap-4">
+                    <LanguageSwitcher />
                     <button onClick={() => setIsOpen(!isOpen)} className="text-sm font-mono text-muted-foreground">
                         {isOpen ? "CLOSE" : "MENU"}
                     </button>

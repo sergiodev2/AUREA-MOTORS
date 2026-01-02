@@ -1,13 +1,15 @@
 import { createServerClient } from "@supabase/ssr";
 import { type NextRequest, NextResponse } from "next/server";
+import createMiddleware from 'next-intl/middleware';
+import { routing } from './i18n/routing';
+
+const intlMiddleware = createMiddleware(routing);
 
 export async function middleware(request: NextRequest) {
-    let response = NextResponse.next({
-        request: {
-            headers: request.headers,
-        },
-    });
+    // 1. Run next-intl middleware first to handle routing/locale
+    const response = intlMiddleware(request);
 
+    // 2. Setup Supabase client on top of that response
     const supabase = createServerClient(
         process.env.NEXT_PUBLIC_SUPABASE_URL!,
         process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -17,12 +19,9 @@ export async function middleware(request: NextRequest) {
                     return request.cookies.getAll();
                 },
                 setAll(cookiesToSet) {
-                    cookiesToSet.forEach(({ name, value, options }) =>
+                    cookiesToSet.forEach(({ name, value }) =>
                         request.cookies.set(name, value)
                     );
-                    response = NextResponse.next({
-                        request,
-                    });
                     cookiesToSet.forEach(({ name, value, options }) =>
                         response.cookies.set(name, value, options)
                     );
@@ -31,26 +30,28 @@ export async function middleware(request: NextRequest) {
         }
     );
 
+    // 3. Check auth
     const {
         data: { user },
     } = await supabase.auth.getUser();
 
-    // If accessing admin routes and not authenticated
-    if (request.nextUrl.pathname.startsWith("/admin")) {
-        // Exception for login page
-        if (request.nextUrl.pathname === "/admin/login") {
+    // 4. Protect admin routes
+    const path = request.nextUrl.pathname;
+    const isLoginPage = path.includes('/admin/login');
+    const isAdminSection = path.includes('/admin');
+
+    // Only protect if we are in admin section
+    if (isAdminSection) {
+        if (isLoginPage) {
             if (user) {
                 return NextResponse.redirect(new URL("/admin", request.url));
             }
-            return response;
+        } else {
+            // Protected admin page
+            if (!user) {
+                return NextResponse.redirect(new URL("/admin/login", request.url));
+            }
         }
-
-        if (!user) {
-            return NextResponse.redirect(new URL("/admin/login", request.url));
-        }
-
-        // Optional: Check connection to 'admins' table here or in layout.
-        // For middleware speed, we might trust the generic 'user' check and let layout handle role check.
     }
 
     return response;
@@ -58,6 +59,8 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
     matcher: [
-        "/admin/:path*",
-    ],
+        '/',
+        '/(es|en|fr)/:path*',
+        '/((?!_next|_vercel|.*\\..*).*)'
+    ]
 };
